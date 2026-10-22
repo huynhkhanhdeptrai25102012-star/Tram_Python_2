@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Trạm Python",
+      "hasCanvas": false,
+      "bodyTextLen": 691,
+      "bodyTextHash": "d8c97d0cb94bc5335c5d626857496c1137bde9b00cf5b108234c01b5e76af509",
+      "bodyTextPrefix": "Trạm Python Cơ bản · trắc nghiệm và trả lời ngắn Python 3 Ngân h",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Trạm Python",
+      "hasCanvas": false,
+      "bodyTextLen": 682,
+      "bodyTextHash": "abfcfe3d646091c3c3128f70a3e805fde922e4f81d54f9bfc8c342ea487fb1fa",
+      "bodyTextPrefix": "Trạm Python Cơ bản · trắc nghiệm và trả lời ngắn Ngân hàng 30 tr",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Python Cơ Bản</title>
+    <style>
+        :root {
+            --primary-color: #306998;
+            --secondary-color: #ffd43b;
+            --background-color: #f7f9fa;
+            --card-color: #ffffff;
+            --text-color: #333333;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eeeeee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 0;
+        }
+        .timer-box {
+            background-color: #e74c3c;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            min-width: 70px;
+            justify-content: center;
+        }
+        .progress-bar {
+            height: 6px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        pre {
+            background-color: #272822;
+            color: #f8f8f2;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Consolas', Courier, monospace;
+            font-size: 14px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .option-btn {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-size: 16px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .option-btn:hover:not(:disabled) {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+        .option-btn.correct {
+            background-color: #2ecc71 !important;
+            border-color: #27ae60 !important;
+            color: white;
+        }
+        .option-btn.wrong {
+            background-color: #e74c3c !important;
+            border-color: #c0392b !important;
+            color: white;
+        }
+        .start-screen, .result-screen {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .btn-main {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+        }
+        .btn-main:hover {
+            background-color: #234e75;
+        }
+        .score-text {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #2c3e50;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <!-- Màn hình bắt đầu -->
+    <div id="start-screen" class="start-screen">
+        <h2>🔥 Thử Thách Python Cơ Bản 🔥</h2>
+        <p>Bộ câu hỏi gồm <strong>15 câu</strong> kiểm tra kiến thức về print, biến, toán tử, vòng lặp và câu lệnh điều kiện.</p>
+        <p style="color: #e74c3c; font-weight: bold;">⚠️ Lưu ý: Mỗi câu hỏi chỉ có ĐÚNG 30 GIÂY để trả lời!</p>
+        <button class="btn-main" onclick="startQuiz()">BẮT ĐẦU NGAY</button>
+    </div>
+
+    <!-- Màn hình câu hỏi -->
+    <div id="quiz-screen" class="hidden">
+        <div class="header">
+            <span class="title" id="question-number">Câu hỏi 1/15</span>
+            <div class="timer-box" id="timer">30s</div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="question-text" id="question-text">Nội dung câu hỏi sẽ hiển thị ở đây?</div>
+        <div id="code-block"></div>
+        <div class="options-list" id="options-container">
+            <!-- Các nút đáp án sinh tự động bằng JS -->
+        </div>
+    </div>
+
+    <!-- Màn hình kết quả -->
+    <div id="result-screen" class="result-screen hidden">
+        <h2>Kết Quả Kiểm Tra</h2>
+        <div class="score-text" id="score-text">Bạn đúng: 0 / 15 câu</div>
+        <p id="evaluation-text"></p>
+        <button class="btn-main" onclick="restartQuiz()">LÀM LẠI</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            q: "Để xuất dòng chữ 'Xin chào' ra màn hình, cú pháp nào sau đây đúng?",
+            code: "",
+            options: ["print 'Xin chào'", "print(Xin chào)", "print(\"Xin chào\")", "echo(\"Xin chào\")"],
+            answer: 2
+        },
+        {
+            q: "Câu lệnh gán biến nào sau đây KHÔNG hợp lệ?",
+            code: "",
+            options: ["x = 5", "1_ten = \"Nam\"", "ten_1 = \"Nam\"", "my_var = 10.5"],
+            answer: 1
+        },
+        {
+            q: "Hàm input() trong Python mặc định trả về dữ liệu thuộc kiểu nào?",
+            code: "",
+            options: ["Số nguyên (int)", "Số thực (float)", "Logic (boolean)", "Chuỗi ký tự (str)"],
+            answer: 3
+        },
+        {
+            q: "Đoạn code sau đây sẽ in ra kết quả gì?",
+            code: `a = "5"
+b = "5"
+print(a + b)`,
+            options: ["10", "55", "Lỗi cú pháp", "5 + 5"],
+            answer: 1
+        },
+        {
+            q: "Phép toán nào dùng để chia lấy phần dư trong Python?",
+            code: "",
+            options: ["/", "//", "%", "rem"],
+            answer: 2
+        },
+        {
+            q: "Để so sánh hai giá trị xem có 'bằng nhau' hay không, ta dùng dấu gì?",
+            code: "",
+            options: ["=", "==", "===", "!="],
+            answer: 1
+        },
+        {
+            q: "Đoạn code sau đây xuất ra màn hình chữ gì?",
+            code: `x = 10
+if x > 5:
+    print("A")
+else:
+    print("B")`,
+            options: ["A", "B", "Không in ra gì cả", "Báo lỗi code"],
+            answer: 0
+        },
+        {
+            q: "Trong cấu trúc điều kiện của Python, từ khóa nào thay thế cho 'else if'?",
+            code: "",
+            options: ["elseif", "elfi", "elif", "else_if"],
+            answer: 2
+        },
+        {
+            q: "Quy tắc bắt buộc khi viết khối lệnh sau dấu hai chấm (:) của lệnh if hoặc vòng lặp là gì?",
+            code: "",
+            options: ["Phải viết hoa chữ cái đầu", "Phải thụt lề vào (Tab hoặc dấu cách)", "Phải nằm trong dấu ngoặc nhọn {}", "Không có quy tắc nào cả"],
+            answer: 1
+        },
+        {
+            q: "Vòng lặp nào sau đây sẽ chạy vô hạn (không bao giờ dừng nếu không có lệnh ngắt)?",
+            code: "",
+            options: ["while False:", "while True:", "for i in range(10):", "if True:"],
+            answer: 1
+        },
+        {
+            q: "Lệnh nào dùng để thoát ra khỏi vòng lặp ngay lập tức?",
+            code: "",
+            options: ["stop", "exit", "break", "continue"],
+            answer: 2
+        },
+        {
+            q: "Đoạn code sau đây thực hiện bao nhiêu vòng lặp?",
+            code: `i = 0
+while i < 3:
+    print(i)
+    i = i + 1`,
+            options: ["2 lần", "3 lần", "4 lần", "Vô hạn lần"],
+            answer: 1
+        },
+        {
+            q: "Đoạn code sau đây in ra kết quả bằng bao nhiêu?",
+            code: `x = 5
+x += 2
+print(x)`,
+            options: ["2", "5", "7", "Lỗi vì không có dấu +="],
+            answer: 2
+        },
+        {
+            q: "Kiểu dữ liệu nào dùng để lưu trữ giá trị Đúng (True) hoặc Sai (False)?",
+            code: "",
+            options: ["String", "Integer", "Boolean", "Float"],
+            answer: 2
+        },
+        {
+            q: "Kết quả của đoạn code sau là gì?",
+            code: `x = 8
+if x > 10:
+    print("Lớn")
+elif x > 5:
+    print("Vừa")
+else:
+    print("Nhỏ")`,
+            options: ["Lớn", "Vừa", "Nhỏ", "Không in ra gì"],
+            answer: 1
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timerInterval;
+    let timeLeft = 30;
+    let hasAnswered = false;
+
+    function startQuiz() {
+        document.getElementById("start-screen").classList.add("hidden");
+        document.getElementById("quiz-screen").classList.remove("hidden");
+        currentQuestionIndex = 0;
+        score = 0;
+        showQuestion();
+    }
+
+    function showQuestion() {
+        hasAnswered = false;
+        timeLeft = 30;
+        document.getElementById("timer").innerText = timeLeft + "s";
+        document.getElementById("timer").style.backgroundColor = "#e74c3c";
+        
+        let qData = questions[currentQuestionIndex];
+        
+        // Cập nhật tiến độ
+        document.getElementById("question-number").innerText = `Câu hỏi ${currentQuestionIndex + 1}/${questions.length}`;
+        document.getElementById("progress-fill").style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+        
+        // Hiển thị câu hỏi và code nếu có
+        document.getElementById("question-text").innerText = qData.q;
+        let codeBlock = document.getElementById("code-block");
+        if(qData.code) {
+            codeBlock.innerHTML = `<pre><code>${escapeHtml(qData.code)}</code></pre>`;
+        } else {
+            codeBlock.innerHTML = "";
+        }
+        
+        // Hiển thị các đáp án
+        let optionsContainer = document.getElementById("options-container");
+        optionsContainer.innerHTML = "";
+        qData.options.forEach((opt, idx) => {
+            let btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.innerText = opt;
+            btn.onclick = () => selectOption(idx);
+            optionsContainer.appendChild(btn);
+        });
+
+        // Chạy đồng hồ đếm ngược
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById("timer").innerText = timeLeft + "s";
+            if(timeLeft <= 0) {
+                clearInterval(timerInterval);
+                autoTimeOut();
+            }
+        }, 1000);
+    }
+
+    function selectOption(selectedIdx) {
+        if(hasAnswered) return;
+        hasAnswered = true;
+        clearInterval(timerInterval);
+
+        let qData = questions[currentQuestionIndex];
+        let buttons = document.getElementById("options-container").children;
+
+        // Khóa tất cả các nút
+        for(let i=0; i<buttons.length; i++) {
+            buttons[i].disabled = true;
+        }
+
+        if(selectedIdx === qData.answer) {
+            buttons[selectedIdx].classList.add("correct");
+            score++;
+        } else {
+            buttons[selectedIdx].classList.add("wrong");
+            buttons[qData.answer].classList.add("correct"); // Show đáp án đúng
+        }
+
+        // Chuyển câu sau 1.5 giây
+        setTimeout(nextQuestion, 1500);
+    }
+
+    function autoTimeOut() {
+        hasAnswered = true;
+        let qData = questions[currentQuestionIndex];
+        let buttons = document.getElementById("options-container").children;
+
+        for(let i=0; i<buttons.length; i++) {
+            buttons[i].disabled = true;
+        }
+        // Hiện đáp án đúng lên
+        buttons[qData.answer].classList.add("correct");
+
+        setTimeout(nextQuestion, 1500);
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if(currentQuestionIndex < questions.length) {
+            showQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById("quiz-screen").classList.add("hidden");
+        document.getElementById("result-screen").classList.remove("hidden");
+        document.getElementById("score-text").innerText = `Bạn đúng: ${score} / ${questions.length} câu`;
+        
+        let evalText = "";
+        if(score === questions.length) evalText = "🏆 Quá xuất sắc! Bạn của bạn chính là một thiên tài Python tương lai!";
+        else if(score >= 11) evalText = "👍 Rất tốt! Kiến thức cơ bản nắm cực kỳ chắc chắn rồi đấy.";
+        else if(score >= 7) evalText = "😐 Khá ổn, nhưng cần xem lại kỹ bài để tránh bẫy cú pháp nhé.";
+        else evalText = "😢 Yếu quá rồi! Bảo bạn ấy chăm học lại từ bài gán biến với print đi thôi!";
+        
+        document.getElementById("evaluation-text").innerText = evalText;
+    }
+
+    function restartQuiz() {
+        document.getElementById("result-screen").classList.add("hidden");
+        startQuiz();
+    }
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
+</script>
+
+</body>
+</html>
